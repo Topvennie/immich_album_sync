@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 )
 
 type Asset struct {
@@ -185,7 +184,6 @@ func (u *User) syncAssets(ctx context.Context, assets []Asset, external, immich 
 		for _, asset := range e.Assets {
 			externalAssetMap[asset.Name] = asset
 		}
-		fmt.Println(externalAssetMap)
 
 		var removeAssets []Asset
 		for _, asset := range album.Assets {

@@ -44,7 +44,7 @@ func (u *User) getExternalAlbums() ([]Album, error) {
 
 			if strings.Count(relativePath, string(os.PathSeparator)) == 1 {
 				// Handles album names and top level images
-				if d.IsDir() {
+				if d.IsDir() && d.Name()[0] != '.' {
 					albumMap[d.Name()] = Album{
 						Name:   d.Name(),
 						Assets: []Asset{},
