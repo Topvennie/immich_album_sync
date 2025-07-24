@@ -27,11 +27,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build . -t ghcr.io/Topvennie/immich_album_sync:pr-${{ github.sha }}
+          docker build . -t ghcr.io/topvennie/immich_album_sync:pr-${{ github.sha }}
           if [ "${{ github.event_name }}" == "push" ]; then
-            docker tag ghcr.io/Topvennie/immich_album_sync:pr-${{ github.sha }} ghcr.io/Topvennie/immich_album_sync:latest
+            docker tag ghcr.io/topvennie/immich_album_sync:pr-${{ github.sha }} ghcr.io/topvennie/immich_album_sync:latest
           fi
 
       - name: Push Docker image
         if: github.event_name == 'push'
-        run: docker push --all-tags ghcr.io/Topvennie/immich_album_sync
+        run: docker push --all-tags ghcr.io/topvennie/immich_album_sync
