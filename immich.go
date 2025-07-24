@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -30,22 +29,4 @@ func (u *User) immichRequest(ctx context.Context, method string, url string, bod
 	data, err := io.ReadAll(resp.Body)
 
 	return data, err
-}
-
-func (u *User) getID(ctx context.Context) (string, error) {
-	type response struct {
-		ID string `json:"id"`
-	}
-
-	data, err := u.immichRequest(ctx, "GET", "users/me", nil)
-	if err != nil {
-		return "", err
-	}
-
-	var resp response
-	if err := json.Unmarshal(data, &resp); err != nil {
-		return "", err
-	}
-
-	return resp.ID, nil
 }

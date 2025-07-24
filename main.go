@@ -3,14 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 )
 
 type User struct {
 	ImmichURL string
 	APIKey    string
-	ID        string
 	Paths     []string
 }
 
@@ -25,12 +23,6 @@ func main() {
 			APIKey:    u.APIKey,
 			Paths:     u.Paths,
 		}
-
-		id, err := user.getID(context.Background())
-		if err != nil {
-			log.Fatal(err)
-		}
-		user.ID = id
 
 		users = append(users, user)
 	}
