@@ -58,6 +58,11 @@ func (u *User) getExternalAlbums() ([]Album, error) {
 				return nil
 			}
 
+			// FIX: Hardcoded
+			if strings.Contains(path, ".filerun") {
+				return nil
+			}
+
 			parts := strings.Split(relativePath, "/")
 			if len(parts) < 2 {
 				return nil

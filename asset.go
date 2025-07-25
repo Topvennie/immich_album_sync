@@ -39,7 +39,6 @@ func (u *User) getImmichAssets(ctx context.Context) ([]Asset, error) {
 		if err != nil {
 			return nil, err
 		}
-
 		resp, err := u.immichRequest(ctx, "POST", "search/metadata", bytes.NewReader(buf))
 		if err != nil {
 			return nil, err
@@ -142,39 +141,40 @@ func (u *User) RemoveAlbumAssets(ctx context.Context, album *Album, assets []Ass
 }
 
 func (u *User) syncAssets(ctx context.Context, assets []Asset, external, immich []Album) error {
-	immichMap := make(map[string]Album, len(immich))
-	for _, album := range immich {
-		immichMap[album.Name] = album
-	}
 	assetMap := make(map[string]Asset, len(assets))
 	for _, asset := range assets {
 		assetMap[asset.Name] = asset
 	}
 
+	immichMap := make(map[string]Album, len(immich))
+	for _, album := range immich {
+		immichMap[album.Name] = album
+	}
+
 	for _, e := range external {
-		album, ok := immichMap[e.Name]
+		immichAlbum, ok := immichMap[e.Name]
 		if !ok {
 			continue
 		}
 
 		// Add assets
-		albumAssetMap := make(map[string]Asset, len(album.Assets))
-		for _, asset := range album.Assets {
-			albumAssetMap[asset.Name] = asset
+		immichAssetMap := make(map[string]Asset, len(immichAlbum.Assets))
+		for _, asset := range immichAlbum.Assets {
+			immichAssetMap[asset.Name] = asset
 		}
 
 		var addAssets []Asset
 		for _, asset := range e.Assets {
-			if _, ok := assetMap[asset.Name]; !ok {
-				continue // Image is not in immich yet
-			}
-			if _, ok := albumAssetMap[asset.Name]; !ok {
-				addAssets = append(addAssets, asset)
+			if _, ok := immichAssetMap[asset.Name]; !ok {
+				newAsset, ok := assetMap[asset.Name]
+				if ok {
+					addAssets = append(addAssets, newAsset)
+				}
 			}
 		}
 
 		if addAssets != nil {
-			if err := u.AddAlbumAssets(ctx, &album, addAssets); err != nil {
+			if err := u.AddAlbumAssets(ctx, &immichAlbum, addAssets); err != nil {
 				return err
 			}
 		}
@@ -186,14 +186,14 @@ func (u *User) syncAssets(ctx context.Context, assets []Asset, external, immich 
 		}
 
 		var removeAssets []Asset
-		for _, asset := range album.Assets {
+		for _, asset := range immichAlbum.Assets {
 			if _, ok := externalAssetMap[asset.Name]; !ok {
 				removeAssets = append(removeAssets, asset)
 			}
 		}
 
 		if removeAssets != nil {
-			if err := u.RemoveAlbumAssets(ctx, &album, removeAssets); err != nil {
+			if err := u.RemoveAlbumAssets(ctx, &immichAlbum, removeAssets); err != nil {
 				return err
 			}
 		}
